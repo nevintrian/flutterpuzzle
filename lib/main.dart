@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-void main() => runApp(const MyApp());
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+      .then((_) {
+    runApp(const MyApp());
+  });
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -150,24 +157,14 @@ class _PageState extends State<_Page> {
         elevation: 0,
         centerTitle: true,
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Row(
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                isbool4 == false
-                    ? Text(
-                        "Click : $totalClick9",
-                        style:
-                            const TextStyle(color: Colors.white, fontSize: 20),
-                      )
-                    : Text(
-                        "Click : $totalClick16",
-                        style:
-                            const TextStyle(color: Colors.white, fontSize: 20),
-                      ),
                 Row(
                   children: [
                     const Text(
@@ -183,138 +180,156 @@ class _PageState extends State<_Page> {
                         }),
                   ],
                 ),
-                Row(
-                  children: [
-                    ElevatedButton(
-                        onPressed: () {
-                          refresh();
-                        },
-                        child: const Text('Start')),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    ElevatedButton(
-                        onPressed: () async {
-                          for (int i = 0; i < numberPuzzle.length; i++) {
-                            for (int j = 0; j < numberPuzzle[i].length; j++) {
-                              if (isbool4 == false) {
-                                if (numberPuzzle[i][j] !=
-                                    numberPuzzleFinish9[i][j]) {
-                                  return showAlertDialog(context, false);
-                                }
-                              } else {
-                                if (numberPuzzle[i][j] !=
-                                    numberPuzzleFinish16[i][j]) {
-                                  return showAlertDialog(context, false);
-                                }
-                              }
-                            }
-                          }
-                          return showAlertDialog(context, true);
-                        },
-                        child: const Text('Finish')),
-                  ],
-                ),
-                Row(
-                  children: [
-                    ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            isbool4 = false;
-                            totalPuzzle = 3;
-                            numberPuzzle = numberPuzzle9;
-                          });
-                        },
-                        child: const Text('3 x 3')),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            isbool4 = true;
-                            totalPuzzle = 4;
-                            numberPuzzle = numberPuzzle16;
-                          });
-                        },
-                        child: const Text('4 x 4')),
-                  ],
+                Container(
+                  child: isbool4 == false
+                      ? Text(
+                          "Click : $totalClick9",
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 20),
+                        )
+                      : Text(
+                          "Click : $totalClick16",
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 20),
+                        ),
                 ),
               ],
             ),
-            Container(
-                width: totalPuzzle * 100,
-                height: totalPuzzle * 100,
-                color: Colors.blueGrey,
-                child: Column(
-                  children: [
-                    for (int i = 0; i < totalPuzzle; i++)
-                      Row(
-                        children: [
-                          for (int j = 0; j < totalPuzzle; j++)
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () {
-                                  if (yZeroPosition == i + 1 &&
-                                          xZeroPosition == j ||
-                                      yZeroPosition == i &&
-                                          xZeroPosition == j + 1 ||
-                                      yZeroPosition == i - 1 &&
-                                          xZeroPosition == j ||
-                                      yZeroPosition == i &&
-                                          xZeroPosition == j - 1) {
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Row(
+                children: [
+                  ElevatedButton(
+                      onPressed: () {
+                        refresh();
+                      },
+                      child: const Text('Start')),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  ElevatedButton(
+                      onPressed: () async {
+                        for (int i = 0; i < numberPuzzle.length; i++) {
+                          for (int j = 0; j < numberPuzzle[i].length; j++) {
+                            if (isbool4 == false) {
+                              if (numberPuzzle[i][j] !=
+                                  numberPuzzleFinish9[i][j]) {
+                                return showAlertDialog(context, false);
+                              }
+                            } else {
+                              if (numberPuzzle[i][j] !=
+                                  numberPuzzleFinish16[i][j]) {
+                                return showAlertDialog(context, false);
+                              }
+                            }
+                          }
+                        }
+                        return showAlertDialog(context, true);
+                      },
+                      child: const Text('Finish')),
+                ],
+              ),
+              Row(
+                children: [
+                  ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          isbool4 = false;
+                          totalPuzzle = 3;
+                          numberPuzzle = numberPuzzle9;
+                        });
+                      },
+                      child: const Text('3 x 3')),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          isbool4 = true;
+                          totalPuzzle = 4;
+                          numberPuzzle = numberPuzzle16;
+                        });
+                      },
+                      child: const Text('4 x 4')),
+                ],
+              ),
+            ],
+          ),
+          Container(
+              width: totalPuzzle * 100,
+              height: totalPuzzle * 100,
+              color: Colors.blueGrey,
+              child: Column(
+                children: [
+                  for (int i = 0; i < totalPuzzle; i++)
+                    Row(
+                      children: [
+                        for (int j = 0; j < totalPuzzle; j++)
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                if (yZeroPosition == i + 1 &&
+                                        xZeroPosition == j ||
+                                    yZeroPosition == i &&
+                                        xZeroPosition == j + 1 ||
+                                    yZeroPosition == i - 1 &&
+                                        xZeroPosition == j ||
+                                    yZeroPosition == i &&
+                                        xZeroPosition == j - 1) {
+                                  setState(() {
+                                    numberPuzzle[yZeroPosition][xZeroPosition] =
+                                        numberPuzzle[i][j];
+                                    numberPuzzle[i][j] = 0;
                                     setState(() {
-                                      numberPuzzle[yZeroPosition]
-                                          [xZeroPosition] = numberPuzzle[i][j];
-                                      numberPuzzle[i][j] = 0;
-                                      setState(() {
-                                        isbool4 == false
-                                            ? totalClick9++
-                                            : totalClick16++;
-                                      });
+                                      isbool4 == false
+                                          ? totalClick9++
+                                          : totalClick16++;
                                     });
-                                  }
-                                },
-                                child: Container(
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                        borderRadius: const BorderRadius.all(
-                                          Radius.circular(5),
-                                        ),
-                                        color: numberPuzzle[i][j] == 0
-                                            ? Colors.blueGrey
-                                            : Colors.white,
-                                        border: Border.all(
-                                          color: Colors.blueGrey,
-                                        )),
-                                    height: 100,
-                                    alignment: Alignment.center,
-                                    child: !isImage
-                                        ? Text(
-                                            '${numberPuzzle[i][j]}',
-                                            style: const TextStyle(
-                                              color: Colors.blueGrey,
-                                            ),
-                                          )
-                                        : ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(5),
-                                            child: numberPuzzle[i][j] != 0
-                                                ? Image.asset(
-                                                    'assets/images/$totalPuzzle'
-                                                    '_'
-                                                    '${numberPuzzle[i][j]}'
-                                                    '.png',
-                                                  )
-                                                : const Text(""))),
-                              ),
+                                  });
+                                }
+                              },
+                              child: Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(5),
+                                      ),
+                                      color: numberPuzzle[i][j] == 0
+                                          ? Colors.blueGrey
+                                          : Colors.white,
+                                      border: Border.all(
+                                        color: Colors.blueGrey,
+                                      )),
+                                  height: 100,
+                                  alignment: Alignment.center,
+                                  child: !isImage
+                                      ? Text(
+                                          '${numberPuzzle[i][j]}',
+                                          style: const TextStyle(
+                                            color: Colors.blueGrey,
+                                          ),
+                                        )
+                                      : ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          child: numberPuzzle[i][j] != 0
+                                              ? Image.asset(
+                                                  'assets/images/$totalPuzzle'
+                                                  '_'
+                                                  '${numberPuzzle[i][j]}'
+                                                  '.png',
+                                                )
+                                              : const Text(""))),
                             ),
-                        ],
-                      ),
-                  ],
-                )),
-          ],
-        ),
+                          ),
+                      ],
+                    ),
+                ],
+              )),
+        ],
       ),
     );
   }
