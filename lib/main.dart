@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_puzzle/ad_helper.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,6 +31,10 @@ class _Page extends StatefulWidget {
 }
 
 class _PageState extends State<_Page> {
+  late BannerAd _bannerAd;
+  bool _isBannerAdReady = false;
+  bool isGuide = false;
+
   bool isImage = false;
   bool is16 = false;
   bool isbool4 = false;
@@ -71,7 +77,34 @@ class _PageState extends State<_Page> {
   @override
   void initState() {
     cekZeroPuzzle();
+
+    _bannerAd = BannerAd(
+      adUnitId: AdHelper.bannerAdUnitId,
+      request: const AdRequest(),
+      size: AdSize.banner,
+      listener: BannerAdListener(
+        onAdLoaded: (_) {
+          setState(() {
+            _isBannerAdReady = true;
+          });
+        },
+        onAdFailedToLoad: (ad, err) {
+          // print('Failed to load a banner ad: ${err.message}');
+          _isBannerAdReady = false;
+          ad.dispose();
+        },
+      ),
+    );
+    _bannerAd.load();
+
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _bannerAd.dispose();
+
+    super.dispose();
   }
 
   void clickBalok(int x, int y) {}
@@ -329,6 +362,15 @@ class _PageState extends State<_Page> {
                     ),
                 ],
               )),
+          if (_isBannerAdReady)
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: SizedBox(
+                width: _bannerAd.size.width.toDouble(),
+                height: _bannerAd.size.height.toDouble(),
+                child: AdWidget(ad: _bannerAd),
+              ),
+            ),
         ],
       ),
     );
