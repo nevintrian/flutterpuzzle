@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.flutter_puzzle">
+    package="com.flutter_puzzle.flutter_puzzle">
    <application
         android:label="flutter_puzzle"
         android:name="${applicationName}"
