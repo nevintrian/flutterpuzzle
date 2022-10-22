@@ -213,7 +213,7 @@ class _PageState extends State<_Page> {
       onPressed: () {
         if (success) {
           refresh();
-          // _createInterstitialAd();
+          _createInterstitialAd();
           trialCount++;
           Navigator.pop(context);
         } else {
