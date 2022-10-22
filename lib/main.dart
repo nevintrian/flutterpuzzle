@@ -5,6 +5,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) {
     runApp(const MyApp());
@@ -32,6 +33,9 @@ class _Page extends StatefulWidget {
 
 class _PageState extends State<_Page> {
   late BannerAd _bannerAd;
+  InterstitialAd? _interstitialAd;
+  int _numInterstitialLoadAttempts = 0;
+  int maxFailedLoadAttempts = 3;
   bool _isBannerAdReady = false;
   bool isGuide = false;
 
@@ -39,17 +43,25 @@ class _PageState extends State<_Page> {
   bool is16 = false;
   bool isbool4 = false;
 
+  int totalPuzzle = 3;
+  int xZeroPosition = 0;
+  int yZeroPosition = 0;
+  int totalClick9 = 0;
+  int totalClick16 = 0;
+
   List<List<int>> numberPuzzleFinish9 = [
     [1, 2, 3],
     [4, 5, 6],
     [7, 8, 0]
   ];
+
   List<List<int>> numberPuzzleFinish16 = [
     [1, 2, 3, 4],
     [5, 6, 7, 8],
     [9, 10, 11, 12],
     [13, 14, 15, 0]
   ];
+
   List<List<int>> numberPuzzle = [
     [1, 0, 3],
     [4, 2, 6],
@@ -69,15 +81,21 @@ class _PageState extends State<_Page> {
     [8, 6, 5, 4]
   ];
 
-  int totalPuzzle = 3;
-  int xZeroPosition = 0;
-  int yZeroPosition = 0;
-  int totalClick9 = 0;
-  int totalClick16 = 0;
   @override
   void initState() {
     cekZeroPuzzle();
+    _createBannerAd();
+    super.initState();
+  }
 
+  @override
+  void dispose() {
+    _bannerAd.dispose();
+    _interstitialAd?.dispose();
+    super.dispose();
+  }
+
+  void _createBannerAd() {
     _bannerAd = BannerAd(
       adUnitId: AdHelper.bannerAdUnitId,
       request: const AdRequest(),
@@ -96,15 +114,41 @@ class _PageState extends State<_Page> {
       ),
     );
     _bannerAd.load();
-
-    super.initState();
   }
 
-  @override
-  void dispose() {
-    _bannerAd.dispose();
+  void _createInterstitialAd() {
+    InterstitialAd.load(
+      adUnitId: AdHelper.interstitialAd,
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (InterstitialAd ad) {
+          _interstitialAd = ad;
+          _numInterstitialLoadAttempts = 0;
+          _showInterstitialAd();
+        },
+        onAdFailedToLoad: (LoadAdError error) {
+          _numInterstitialLoadAttempts += 1;
+          _interstitialAd = null;
+          if (_numInterstitialLoadAttempts < maxFailedLoadAttempts) {
+            _createInterstitialAd();
+          }
+        },
+      ),
+    );
+  }
 
-    super.dispose();
+  void _showInterstitialAd() {
+    if (_interstitialAd == null) {
+      // print('Warning: attempt to show interstitial before loaded.');
+      return;
+    }
+    _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
+      onAdDismissedFullScreenContent: (InterstitialAd ad) {
+        ad.dispose();
+      },
+    );
+    _interstitialAd!.show();
+    _interstitialAd = null;
   }
 
   void clickBalok(int x, int y) {}
@@ -145,6 +189,7 @@ class _PageState extends State<_Page> {
       onPressed: () {
         if (success) {
           refresh();
+          _createInterstitialAd();
           Navigator.pop(context);
         } else {
           Navigator.pop(context);
