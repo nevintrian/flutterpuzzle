@@ -36,10 +36,12 @@ class _PageState extends State<_Page> {
   InterstitialAd? _interstitialAd;
   int _numInterstitialLoadAttempts = 0;
   int maxFailedLoadAttempts = 3;
+  int trialCount = 1;
   bool _isBannerAdReady = false;
   bool isGuide = false;
 
   bool isImage = false;
+  bool isAnswer = false;
   bool is16 = false;
   bool isbool4 = false;
 
@@ -165,21 +167,43 @@ class _PageState extends State<_Page> {
     }
   }
 
+  refreshRandom9() {
+    var row1 = [1, 0, 8];
+    var row2 = [5, 2, 7];
+    var row3 = [4, 6, 3];
+
+    row1.shuffle();
+    row2.shuffle();
+    row3.shuffle();
+
+    var numberPuzzle = [row1, row2, row3];
+    numberPuzzle.shuffle();
+    return numberPuzzle;
+  }
+
+  refreshRandom16() {
+    var row1 = [1, 11, 10, 9];
+    var row2 = [7, 2, 0, 14];
+    var row3 = [9, 13, 3, 12];
+    var row4 = [8, 6, 5, 4];
+
+    row1.shuffle();
+    row2.shuffle();
+    row3.shuffle();
+    row4.shuffle();
+
+    var numberPuzzle = [row1, row2, row3, row4];
+    numberPuzzle.shuffle();
+    return numberPuzzle;
+  }
+
   void refresh() {
     setState(() {
+      isAnswer = false;
       isbool4 == false ? totalClick9 = 0 : totalClick16 = 0;
       isbool4 == false
-          ? numberPuzzle = [
-              [1, 0, 8],
-              [5, 2, 7],
-              [4, 6, 3]
-            ]
-          : numberPuzzle = [
-              [1, 11, 10, 9],
-              [7, 2, 0, 14],
-              [9, 13, 3, 12],
-              [8, 6, 5, 4]
-            ];
+          ? numberPuzzle = refreshRandom9()
+          : numberPuzzle = refreshRandom16();
     });
   }
 
@@ -189,7 +213,8 @@ class _PageState extends State<_Page> {
       onPressed: () {
         if (success) {
           refresh();
-          _createInterstitialAd();
+          // _createInterstitialAd();
+          trialCount++;
           Navigator.pop(context);
         } else {
           Navigator.pop(context);
@@ -205,8 +230,10 @@ class _PageState extends State<_Page> {
     AlertDialog alertSucess = AlertDialog(
       title: const Text("Congratulation"),
       content: isbool4 == false
-          ? Text("You clear this puzzle with $totalClick9, try it again?")
-          : Text("You clear this puzzle with $totalClick16, try it again?"),
+          ? Text(
+              "You clear this puzzle with $totalClick9 click, want to try again ${trialCount + 1} times?")
+          : Text(
+              "You clear this puzzle with $totalClick16 click, want to try again ${trialCount + 1} times?"),
       actions: [okButton, cancelButton],
     );
 
@@ -239,14 +266,14 @@ class _PageState extends State<_Page> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Row(
                   children: [
                     const Text(
-                      'Image Mode :',
+                      'Show Image :',
                       style: TextStyle(color: Colors.white, fontSize: 20),
                     ),
                     Switch(
@@ -270,6 +297,48 @@ class _PageState extends State<_Page> {
                           style: const TextStyle(
                               color: Colors.white, fontSize: 20),
                         ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Row(
+                  children: [
+                    const Text(
+                      'Show Answer :',
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    ),
+                    Switch(
+                        value: isAnswer,
+                        onChanged: (value) {
+                          setState(() {
+                            isAnswer = value;
+                            isImage = true;
+                            isbool4 == false
+                                ? numberPuzzle = [
+                                    [1, 2, 3],
+                                    [4, 5, 6],
+                                    [7, 8, 0]
+                                  ]
+                                : numberPuzzle = [
+                                    [1, 2, 3, 4],
+                                    [5, 6, 7, 8],
+                                    [9, 10, 11, 12],
+                                    [13, 14, 15, 0]
+                                  ];
+                          });
+                        }),
+                  ],
+                ),
+                SizedBox(
+                  child: Text(
+                    "Trial : $trialCount",
+                    style: const TextStyle(color: Colors.white, fontSize: 20),
+                  ),
                 ),
               ],
             ),
@@ -314,9 +383,10 @@ class _PageState extends State<_Page> {
                   ElevatedButton(
                       onPressed: () {
                         setState(() {
+                          isAnswer = false;
                           isbool4 = false;
                           totalPuzzle = 3;
-                          numberPuzzle = numberPuzzle9;
+                          numberPuzzle = refreshRandom9();
                         });
                       },
                       child: const Text('3 x 3')),
@@ -326,9 +396,10 @@ class _PageState extends State<_Page> {
                   ElevatedButton(
                       onPressed: () {
                         setState(() {
+                          isAnswer = false;
                           isbool4 = true;
                           totalPuzzle = 4;
-                          numberPuzzle = numberPuzzle16;
+                          numberPuzzle = refreshRandom16();
                         });
                       },
                       child: const Text('4 x 4')),
@@ -362,6 +433,7 @@ class _PageState extends State<_Page> {
                                         numberPuzzle[i][j];
                                     numberPuzzle[i][j] = 0;
                                     setState(() {
+                                      isAnswer = false;
                                       isbool4 == false
                                           ? totalClick9++
                                           : totalClick16++;
